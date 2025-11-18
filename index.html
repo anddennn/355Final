@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reddit Sentiment Project</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    h1, h2 {
+      margin-bottom: 0.25rem;
+    }
+    p.caption {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .row {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .chart {
+      flex: 1 1 320px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Reddit Sentiment on Top Communities (2015–2025)</h1>
+  <p class="caption">
+    Exploring how subreddit popularity and sentiment have changed over the past decade.
+  </p>
+
+  <!-- Vis 1: Popularity over time -->
+  <section>
+    <h2>1. Popularity of Subreddits Over Time</h2>
+    <p class="caption">
+      Number of posts per year in each subreddit. Shows which topics are rising or fading.
+    </p>
+    <div id="vis-popularity"></div>
+  </section>
+
+  <!-- Vis 2 + 3: side by side -->
+  <section class="row">
+    <div class="chart">
+      <h2>2. Average Sentiment by Subreddit</h2>
+      <p class="caption">
+        Mean sentiment score of posts in each community across 2015–2025.
+      </p>
+      <div id="vis-sentiment-subreddit"></div>
+    </div>
+
+    <div class="chart">
+      <h2>3. Does Emotional Tone Drive Upvotes?</h2>
+      <p class="caption">
+        Each point is a post. Filter by subreddit using the legend.
+      </p>
+      <div id="vis-sentiment-score"></div>
+    </div>
+  </section>
+
+  <!-- Vega / Vega-Lite / vega-embed -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <script src="main.js"></script>
+</body>
+</html>
+
