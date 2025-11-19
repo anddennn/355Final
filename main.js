@@ -22,23 +22,42 @@ const embed = (selector, spec, name) => {
 
 // Vis 1: Popularity over time
 const redditPopularityByYear = baseSpec({
-  transform: [{
-    timeUnit: "year",
-    field: "date_utc",
-    as: "year"
-  }],
+  transform: [
+    {
+      filter: "year(datum.date_utc) >= 2020 && year(datum.date_utc) <= 2025"
+    },
+    {
+      timeUnit: "year",
+      field: "date_utc",
+      as: "year"
+    }
+  ],
   mark: "line",
   encoding: {
-    x: { field: "year", type: "temporal", title: "Year" },
-    y: { aggregate: "count", type: "quantitative", title: "Number of posts" },
-    color: { field: "subreddit", type: "nominal", title: "Subreddit" },
+    x: {
+      field: "year",
+      type: "temporal",
+      title: "Year"
+    },
+    y: {
+      aggregate: "average",
+      field: "score",
+      type: "quantitative",
+      title: "Average Score",
+      scale: { domain: [50000, 200000] }
+    },
+    color: {
+      field: "subreddit",
+      type: "nominal",
+      title: "Subreddit"
+    },
     tooltip: [
       { field: "year", type: "temporal", title: "Year" },
       { field: "subreddit", type: "nominal", title: "Subreddit" },
-      { aggregate: "count", type: "quantitative", title: "Posts in year" }
+      { aggregate: "average", field: "score", type: "quantitative", title: "Avg Score" }
     ]
   },
-  width: 800,
+  width: 400,
   height: CHART_HEIGHT
 });
 
