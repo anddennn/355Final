@@ -14,9 +14,7 @@ html {
 
 body {
     font-family: sans-serif;
-    max-width: 1100px;
     margin: 0 auto;
-    padding: 1.5rem;
     background-color: #ffffff;
     color: #222;
     line-height: 1.6;
@@ -65,12 +63,11 @@ nav a {
 }
 
 nav a:hover {
-    color: #0066cc;
+    color: #EE5A24;
 }
 
-/* ------------------------------------
-   HEADINGS + TEXT
------------------------------------- */
+/* HEADINGS + TEXT */
+
 h1 {
     font-size: 2rem;
     margin: 20px;
@@ -84,11 +81,12 @@ h2 {
 
 h3 {
     font-size: 1.25rem;
-    margin-bottom: 8px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 p {
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
     max-width: 700px;
 }
 
@@ -108,13 +106,13 @@ a.button {
     background: #EE5A24;
     color: white;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 1rem;
     transition: background 0.2s ease;
 }
 
 .button:hover {
     background: #e88561;
-    transform: translateY(-3px); /* moves UP 3px */
+    transform: translateY(-3px);
 }
 
 /*VISUALIZATION BOXES*/
@@ -128,9 +126,8 @@ a.button {
     background: #fafafa;
 }
 
-/* ------------------------------------
-   RESPONSIVE BREAKPOINTS
------------------------------------- */
+/* RESPONSIVE BREAKPOINTS*/
+
 @media (max-width: 768px) {
     nav {
         flex-wrap: wrap;
