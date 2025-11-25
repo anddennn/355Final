@@ -50,15 +50,37 @@
     <section class="taskVisualization">
             <h2>OUR TASKS</h2>
             <div class="visualization1">
-                 <h3>1. Track emotional trends </h3>
+                <h3>1. Track emotional trends </h3>
+                    <p class="caption">
+                    Taking into account the average score (upvotes - downvotes) of posts in each subreddit for the past 5 years.
+                    </p>
+                    <div id="vis-popularity"></div>
             </div>
             <div class="visualization2">
                 <h3>2.Compare subreddits and popular topics:</h3>
+                    <p class="caption">
+                    Mean sentiment score of posts in each community across 2015–2025.
+                    </p>
+                    <div id="vis-sentiment-subreddit"></div>
             </div>
             <div class="visualization3">
                 <h3>3. Identify reaction patterns:</h3>
+                    <p class="caption">
+                    Each point is a post. Filter by subreddit using the legend.
+                    </p>
+                    <div id="vis-sentiment-score"></div>
             </div>
-    </section>
+            
+<!-- Vega / Vega-Lite / vega-embed -->
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+<script src="main.js"></script>
+<body>
+
+
+
 
 
 </body>
