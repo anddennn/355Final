@@ -128,7 +128,60 @@ const redditSentimentVsScore = baseSpec({
   height: CHART_HEIGHT
 });
 
+// Vis 4: Engagement vs Sentiment (bubble chart)
+const redditEngagementVsSentiment = baseSpec({
+  transform: [
+    {
+      calculate: "datum.score + datum.num_comments",
+      as: "engagement"
+    },
+    {
+      aggregate: [
+        { op: "mean", field: "engagement", as: "avg_engagement" },
+        { op: "mean", field: "sentiment_score", as: "avg_sentiment" }
+      ],
+      groupby: ["subreddit"]
+    }
+  ],
+  mark: { type: "circle", opacity: 1 },
+  encoding: {
+    x: {
+      field: "avg_sentiment",
+      type: "quantitative",
+      title: "Average Sentiment (Negative → Positive)",
+      scale: { domain: [-0.2, 0.2] }
+    },
+    y: {
+      field: "avg_engagement",
+      type: "quantitative",
+      title: "Average Engagement"
+    },
+    size: {
+      field: "avg_engagement",
+      type: "quantitative",
+      title: "Bubble Size (Avg Engagement)",
+      legend: null,  // removed the legend
+      scale: { range: [50, 2000] }
+    },
+    color: {
+      field: "avg_sentiment",
+      type: "quantitative",
+      title: "Sentiment",
+      legend: null,  // removed the legend
+      scale: { scheme: "redblue", reverse: true }
+    },
+    tooltip: [
+      { field: "subreddit", type: "nominal" },
+      { field: "avg_engagement", type: "quantitative" },
+      { field: "avg_sentiment", type: "quantitative" }
+    ]
+  },
+  width: 400,
+  height: CHART_HEIGHT
+});
+
 // Embed all visualizations
 embed("#vis-popularity", redditPopularityByYear, "Vis 1");
 embed("#vis-sentiment-subreddit", redditAvgSentimentBySubreddit, "Vis 2");
 embed("#vis-sentiment-score", redditSentimentVsScore, "Vis 3");
+embed("#vis-engagement-sentiment", redditEngagementVsSentiment, "Vis 4");
