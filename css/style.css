@@ -377,6 +377,28 @@ a.button {
     }
 }
 
+/* VIS REFLECTION - TWO COLUMN LAYOUT */
+.vis-reflection-content.flex {
+    display: flex;
+    gap: 2vw;
+    align-items: flex-start;
+    margin-top: 2vw;
+}
+
+.vis-reflection-text {
+    flex: 1;
+}
+
+.vis-reflection-image {
+    flex: 1;
+}
+
+.deepdive-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* FOOTER */
 footer {
     padding: 1vw 10vw;
