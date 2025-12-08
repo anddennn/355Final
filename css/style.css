@@ -212,6 +212,27 @@ section#title {
     border: none;
 }
 
+/* TIMELINE */
+.timeline-container {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    margin-top: 2vw;
+    margin-bottom: 2vw;
+    padding-left: 10vw;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.timeline-image {
+    width: auto;
+    min-width: 150%;
+    height: auto;
+    display: block;
+    max-height: 500px;
+}
+
 /*BUTTONS*/
 .button, 
 a.button {
