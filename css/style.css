@@ -1,27 +1,46 @@
 
+/* FONT IMPORTS */
+@font-face {
+    font-family: 'Reddit Sans';
+    font-style: italic;
+    src: url(../fonts/RedditSans-VariableFont_wght.ttf) format('truetype');
+}
+
+
+@font-face {
+    font-family: 'Reddit Sans Italic';
+    font-style: italic;
+    src: url(../fonts/RedditSans-Italic-VariableFont_wght.ttf) format('truetype');
+}
+
 /* RESET + GLOBAL STYLES */
 
+:root {
+    --white: #F9F8F8;
+    --black: #0A0909;
+}
+
 * {
+    font-family: 'Reddit Sans', serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 html {
-    font-size: 16px;
+    font-size: 1rem;
     scroll-behavior: smooth;
 }
 
 body {
     font-family: sans-serif;
     margin: 0 auto;
-    background-color: #ffffff;
-    color: #222;
+    background-color: var(--white);
+    color: var(--black);
     line-height: 1.6;
 }
 
-h1,
-h2 {
+h1,h2, h3 {
     margin-bottom: 0.25rem;
 }
 
@@ -45,26 +64,50 @@ p.caption {
 /* NAVBAR */
 
 nav {
-    width: 100%;
-    background: #f3f3f3;
-    padding: 12px 20px;
-    display: flex;
-    gap: 20px;
-    position: sticky;
+    position: fixed;       /* stays visible when scrolling */
     top: 0;
-    z-index: 10;
+    left: 50%;
+    transform: translateX(-50%);   /* centers the whole bar */
+    
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #ccc;
+    background: white;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
+
+    width: 80%;            /* optional — adjust to taste */
+    box-sizing: border-box;
 }
 
 nav a {
+    padding: 12px 20px;
     text-decoration: none;
-    font-weight: bold;
-    color: #333;
-    transition: 0.2s ease;
+    color: black;
+    text-align: center;
+    border-left: 1px solid #ccc;
+    white-space: nowrap;
 }
 
-nav a:hover {
-    color: #EE5A24;
+nav a:first-child {
+    border-left: none;
 }
+
+/* wider first item */
+nav a.wide {
+    flex: 3;
+}
+
+/* spacing block between first and other links */
+nav .spacer {
+    width: 40px;      /* adjust spacing here */
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    height: 100%;
+}
+
 
 /* HEADINGS + TEXT */
 

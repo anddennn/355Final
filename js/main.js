@@ -1,7 +1,7 @@
 // main.js
 // Vega-Lite visualizations for Reddit sentiment analysis
 
-const DATA_URL = "website/Reddit Posts 2015-2025.csv";
+const DATA_URL = "../Reddit Posts 2015-2025.csv";
 const SCHEMA = "https://vega.github.io/schema/vega-lite/v5.json";
 const CHART_HEIGHT = 280;
 const EMBED_OPTIONS = { actions: false };
