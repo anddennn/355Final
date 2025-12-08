@@ -64,17 +64,19 @@ p.caption {
 /* NAVBAR */
 
 nav {
-    position: fixed;       /* stays visible when scrolling */
+    position: fixed;
     top: 20px;
     left: 50%;
-    transform: translateX(-50%);   /* centers the whole bar */
+    transform: translateX(-50%);
     
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
 
-    border: 1px solid #ccc;
-    background: white;
+    border: none;
+    background: transparent;
     z-index: 1000;
     padding: 0;
     margin: 0;
@@ -89,26 +91,31 @@ nav a {
     text-decoration: none;
     color: black;
     text-align: center;
-    border-left: 1px solid #ccc;
     white-space: nowrap;
+    background: white;
+    border: 1px solid #ccc;
+    border-right: none;
+    transition: background 0.2s ease;
 }
 
-nav a:first-child {
-    border-left: none;
+nav a:last-child {
+    border-right: 1px solid #ccc;
 }
 
-/* wider first item */
+nav a:hover {
+    background: #f5f5f5;
+}
+
 nav a.wide {
     flex: 0 0 auto;
     max-width: 300px;
 }
 
-/* spacing block between first and other links */
 nav .spacer {
-    width: 40px;      /* adjust spacing here */
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+    width: 40px;
     height: 100%;
+    background: transparent;
+    border: none;
 }
 
 
@@ -165,6 +172,8 @@ section#title {
     width: 80vw;
     margin: 0 auto;
     display: block;
+    min-height: 200px;
+    margin-bottom: 2vw;
 }
 
 .hero-image {
@@ -192,6 +201,8 @@ section#title {
     left: 0px;
     padding: 20px 30px;
     max-width: 50vw;
+    z-index: 2;
+    background: linear-gradient(to right, var(--white) 0%, var(--white) 70%, transparent 100%);
 }
 
 .hero-heading h1 {
@@ -208,12 +219,14 @@ section#title {
 .hero-content {
     display: flex;
     gap: 3vw;
-    margin-top: 2vw;
+    margin-top: 4vw;
     width: 80vw;
-    padding-top: 10vh;
+    padding-top: 12vh;
     margin-left: auto;
     margin-right: auto;
     clear: both;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-content p {
@@ -263,7 +276,6 @@ section#title {
     max-height: 500px;
 }
 
-/* CONTEXT MAP - TWO COLUMN LAYOUT */
 .context-map.flex {
     display: flex;
     gap: 2vw;
@@ -280,9 +292,30 @@ section#title {
 
 .context-map .visualization > div {
     width: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
-/* SUBREDDIT BUTTONS */
+.context-map .visualization > div svg,
+.context-map .visualization > div canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.context-map .visualization #vis-popularity {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.context-map .visualization #vis-popularity svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    display: block;
+}
+
 .subreddits.flex {
     display: flex;
     flex-wrap: nowrap;
@@ -311,7 +344,6 @@ section#title {
     color: var(--white);
 }
 
-/*BUTTONS*/
 .button, 
 a.button {
     display: inline-block;
@@ -329,8 +361,6 @@ a.button {
     transform: translateY(-3px);
 }
 
-/*VISUALIZATION BOXES*/
-
 .datasetVisualizations,
 .taskVisualization div {
     border: 1px solid #ddd;
@@ -340,44 +370,220 @@ a.button {
     background: #fafafa;
 }
 
-/* RESPONSIVE BREAKPOINTS*/
+@media (max-width: 1024px) {
+    .hero-container {
+        width: 90vw;
+        min-height: 250px;
+    }
+
+    .hero-content {
+        width: 90vw;
+        padding-top: 14vh;
+        margin-top: 5vw;
+    }
+
+    .hero-heading {
+        max-width: 60vw;
+    }
+
+    section {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+}
 
 @media (max-width: 768px) {
     nav {
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 5px;
+        top: 10px;
+        max-width: 95%;
     }
 
     nav a {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
+        padding: 10px 16px;
     }
 
-    h1 {
-        font-size: 1.6rem;
+    nav a.wide {
+        max-width: 200px;
+    }
+
+    .hero-container {
+        width: 100%;
+        padding: 0 5vw;
+    }
+
+    .hero-image {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .hero-overlay {
+        width: 100%;
+    }
+
+    .hero-heading {
+        position: relative;
+        max-width: 100%;
+        padding: 15px 20px;
+        margin-bottom: 2vw;
+    }
+
+    .hero-heading h1 {
+        font-size: 2rem;
+    }
+
+    .hero-heading h2 {
+        font-size: 1.5rem;
+    }
+
+    .hero-content {
+        flex-direction: column;
+        width: 100%;
+        padding: 0 5vw;
+        margin-top: 4vw;
+        padding-top: 4vw;
+        gap: 2vw;
     }
 
     section {
-        padding-left: 10vw;
-        padding-right: 10vw;
+        padding-left: 5vw;
+        padding-right: 5vw;
+        padding-top: 8vw;
+        padding-bottom: 8vw;
+    }
+
+    section#title {
+        min-height: auto;
+        padding-top: 80px;
+        padding-bottom: 6vw;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+
+    .context-map.flex {
+        flex-direction: column;
+        gap: 4vw;
+    }
+
+    .vis-reflection-content.flex {
+        flex-direction: column;
+        gap: 4vw;
+    }
+
+    .timeline-container {
+        padding-left: 5vw;
+    }
+
+    .timeline {
+        margin-top: 6vw;
+        margin-bottom: 6vw;
+    }
+
+    footer {
+        padding: 3vw 5vw;
+        padding-bottom: 4vw;
     }
 }
 
 @media (max-width: 480px) {
     nav {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        top: 5px;
+        max-width: 98%;
     }
 
     nav a {
-        padding: 6px 0;
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+
+    nav a.wide {
+        max-width: 150px;
+        flex: 0 0 auto;
+    }
+
+    .hero-heading {
+        padding: 12px 15px;
+    }
+
+    .hero-heading h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero-heading h2 {
+        font-size: 1.2rem;
+    }
+
+    .hero-content {
+        padding-top: 3vw;
+        margin-top: 3vw;
+    }
+
+    section {
+        padding-left: 4vw;
+        padding-right: 4vw;
+        padding-top: 10vw;
+        padding-bottom: 10vw;
+    }
+
+    section#title {
+        padding-top: 70px;
     }
 
     h1 {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
+        margin: 10px;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    p {
+        font-size: 0.9rem;
+    }
+
+    .subreddit-button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .timeline-container {
+        padding-left: 4vw;
+    }
+
+    .timeline-image {
+        max-height: 300px;
+    }
+
+    footer {
+        padding: 4vw 4vw;
+        padding-bottom: 5vw;
+    }
+
+    footer p {
+        font-size: 0.85rem;
     }
 }
 
-/* VIS REFLECTION - TWO COLUMN LAYOUT */
 .vis-reflection-content.flex {
     display: flex;
     gap: 2vw;
@@ -399,7 +605,6 @@ a.button {
     display: block;
 }
 
-/* FOOTER */
 footer {
     padding: 1vw 10vw;
     padding-bottom: 3vw;

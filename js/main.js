@@ -1,26 +1,43 @@
-// main.js
-// Vega-Lite visualizations for Reddit sentiment analysis
-
 const DATA_URL = "../Reddit Posts 2015-2025.csv";
 const SCHEMA = "https://vega.github.io/schema/vega-lite/v5.json";
 const CHART_HEIGHT = 280;
 const EMBED_OPTIONS = { actions: false };
 
-// Helper function to create base spec
 const baseSpec = (overrides) => ({
   $schema: SCHEMA,
   data: { url: DATA_URL },
   ...overrides
 });
 
-// Helper function to embed visualizations
-const embed = (selector, spec, name) => {
-  vegaEmbed(selector, spec, EMBED_OPTIONS)
-    .then(() => console.log(`${name} loaded`))
-    .catch(error => console.error(`${name} error:`, error));
+const getResponsiveWidth = (selector) => {
+  const container = document.querySelector(selector);
+  if (container && container.parentElement) {
+    return Math.min(container.parentElement.offsetWidth - 40, 800);
+  }
+  return 400;
 };
 
-// Vis 1: Popularity over time
+const embed = (selector, spec, name) => {
+  const responsiveSpec = {
+    ...spec,
+    width: getResponsiveWidth(selector)
+  };
+  
+  vegaEmbed(selector, responsiveSpec, EMBED_OPTIONS)
+    .then((result) => {
+      console.log(`${name} loaded`);
+      const container = document.querySelector(selector);
+      if (container) {
+        const svg = container.querySelector('svg');
+        if (svg) {
+          svg.style.width = '100%';
+          svg.style.height = 'auto';
+          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        }
+      }
+    })
+    .catch(error => console.error(`${name} error:`, error));
+};
 const redditPopularityByYear = baseSpec({
   transform: [
     {
@@ -61,7 +78,6 @@ const redditPopularityByYear = baseSpec({
   height: CHART_HEIGHT
 });
 
-// Vis 2: Average sentiment by subreddit
 const redditAvgSentimentBySubreddit = baseSpec({
   mark: "bar",
   encoding: {
@@ -89,7 +105,6 @@ const redditAvgSentimentBySubreddit = baseSpec({
   height: CHART_HEIGHT
 });
 
-// Vis 3: Sentiment vs score (scatterplot with interactive legend)
 const redditSentimentVsScore = baseSpec({
   selection: {
     subreddit_select: {
@@ -128,7 +143,6 @@ const redditSentimentVsScore = baseSpec({
   height: CHART_HEIGHT
 });
 
-// Vis 4: Engagement vs Sentiment (bubble chart)
 const redditEngagementVsSentiment = baseSpec({
   transform: [
     {
@@ -160,14 +174,14 @@ const redditEngagementVsSentiment = baseSpec({
       field: "avg_engagement",
       type: "quantitative",
       title: "Bubble Size (Avg Engagement)",
-      legend: null,  // removed the legend
+      legend: null,
       scale: { range: [50, 2000] }
     },
     color: {
       field: "avg_sentiment",
       type: "quantitative",
       title: "Sentiment",
-      legend: null,  // removed the legend
+      legend: null,
       scale: { scheme: "redblue", reverse: true }
     },
     tooltip: [
@@ -180,7 +194,6 @@ const redditEngagementVsSentiment = baseSpec({
   height: CHART_HEIGHT
 });
 
-// Embed all visualizations
 embed("#vis-popularity", redditPopularityByYear, "Vis 1");
 embed("#vis-sentiment-subreddit", redditAvgSentimentBySubreddit, "Vis 2");
 embed("#vis-sentiment-score", redditSentimentVsScore, "Vis 3");
