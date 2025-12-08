@@ -140,15 +140,19 @@ p {
 section {
     max-width: 900px;
     margin: 2vw auto;
-    padding: 0 2vw;
+    padding-top: 6vw;
+    padding-bottom: 6vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
 }
 
 section#title {
-    padding-top: 3vh;
     max-width: 100%;
     margin: 0;
     padding-left: 0;
     padding-right: 0;
+    padding-top: 3vh;
+    padding-bottom: 6vw;
 }
 
 .hero-container {
@@ -213,6 +217,11 @@ section#title {
 }
 
 /* TIMELINE */
+.timeline {
+    margin-top: 10vw;
+    margin-bottom: 10vw;
+}
+
 .timeline-container {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -231,6 +240,25 @@ section#title {
     height: auto;
     display: block;
     max-height: 500px;
+}
+
+/* CONTEXT MAP - TWO COLUMN LAYOUT */
+.context-map.flex {
+    display: flex;
+    gap: 2vw;
+    align-items: flex-start;
+}
+
+.context-map .text {
+    flex: 1;
+}
+
+.context-map .visualization {
+    flex: 1;
+}
+
+.context-map .visualization > div {
+    width: 100%;
 }
 
 /*BUTTONS*/
