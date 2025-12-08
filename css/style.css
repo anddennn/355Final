@@ -65,12 +65,13 @@ p.caption {
 
 nav {
     position: fixed;       /* stays visible when scrolling */
-    top: 0;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);   /* centers the whole bar */
     
     display: flex;
     align-items: center;
+    justify-content: center;
 
     border: 1px solid #ccc;
     background: white;
@@ -78,12 +79,13 @@ nav {
     padding: 0;
     margin: 0;
 
-    width: 80%;            /* optional — adjust to taste */
+    width: fit-content;
+    max-width: 80%;
     box-sizing: border-box;
 }
 
 nav a {
-    padding: 12px 20px;
+    padding: 12px 28px;
     text-decoration: none;
     color: black;
     text-align: center;
@@ -97,7 +99,8 @@ nav a:first-child {
 
 /* wider first item */
 nav a.wide {
-    flex: 3;
+    flex: 0 0 auto;
+    max-width: 300px;
 }
 
 /* spacing block between first and other links */
@@ -136,8 +139,77 @@ p {
 /* SECTIONS */
 section {
     max-width: 900px;
-    margin: 30px auto;
-    padding: 0 20px;
+    margin: 2vw auto;
+    padding: 0 2vw;
+}
+
+section#title {
+    padding-top: 3vh;
+    max-width: 100%;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.hero-container {
+    position: relative;
+    width: 80vw;
+    margin: 3vw 10vw;
+}
+
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.hero-heading {
+    position: absolute;
+    top: 00px;
+    left: 0px;
+    background: var(--white);
+    padding: 20px 30px;
+    max-width: 50vw;
+}
+
+.hero-heading h1 {
+    font-size: 3rem;
+    margin: 0 0 10px 0;
+    text-align: left;
+}
+
+.hero-heading h2 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.hero-content {
+    position: absolute;
+    bottom: 00px;
+    right: 00px;
+    background: var(--white);
+    padding: 20px 30px;
+    max-width: 50vw;
+}
+
+.hero-content p {
+    margin-bottom: 1rem;
+}
+
+.hero-divider {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    height: 2px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--black) 0,
+        var(--black) 15px,
+        transparent 15px,
+        transparent 30px
+    );
+    margin-top: 3vw;
+    margin-bottom: 3vw;
+    border: none;
 }
 
 /*BUTTONS*/
