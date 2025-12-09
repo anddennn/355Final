@@ -305,6 +305,21 @@ section#title {
     display: block;
 }
 
+.sentiment-forecast {
+    margin-top: 4vw;
+    width: 100%;
+}
+
+.sentiment-forecast > div {
+    width: 100%;
+}
+
+.sentiment-forecast > div svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    display: block;
+}
 
 .subreddits.flex {
     display: flex;
