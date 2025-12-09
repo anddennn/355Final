@@ -9,73 +9,103 @@ const baseSpec = (overrides) => ({
   ...overrides
 });
 
-const getResponsiveWidth = (selector) => {
+const getResponsiveWidth = (baseWidth, selector) => {
   const container = document.querySelector(selector);
-  if (container && container.parentElement) {
-    return Math.min(container.parentElement.offsetWidth - 40, 800);
+  if (!container) return baseWidth;
+  
+  const section = container.closest('section');
+  if (!section) return baseWidth;
+  
+  const sectionWidth = section.offsetWidth;
+  const padding = parseFloat(getComputedStyle(section).paddingLeft) + 
+                   parseFloat(getComputedStyle(section).paddingRight);
+  
+  // At 1280px and below, layout is column (text on top, viz below)
+  // So visualization can use full width minus padding
+  if (window.innerWidth <= 1280) {
+    const availableWidth = sectionWidth - padding;
+    // Use a reasonable max width, but allow it to be responsive
+    return Math.min(600, availableWidth);
   }
-  return 400;
+  
+  // Above 1280px, layout is row (side by side)
+  const gap = 32; // 2vw gap between text and visualization
+  const textMinWidth = 300; // Minimum width for text column
+  const availableWidth = sectionWidth - padding - gap - textMinWidth;
+  
+  // Use media query breakpoints
+  if (window.innerWidth <= 1024) {
+    return Math.min(350, availableWidth);
+  } else {
+    return Math.min(baseWidth, availableWidth);
+  }
 };
 
 const embed = (selector, spec, name) => {
-  const responsiveSpec = {
-    ...spec,
-    width: getResponsiveWidth(selector)
-  };
+  // Calculate responsive width for the first visualization
+  let responsiveSpec = spec;
+  if (selector === "#vis-popularity") {
+    const responsiveWidth = getResponsiveWidth(spec.width, selector);
+    responsiveSpec = {
+      ...spec,
+      width: responsiveWidth,
+      height: Math.round((spec.height / spec.width) * responsiveWidth) // Maintain aspect ratio
+    };
+  }
   
   vegaEmbed(selector, responsiveSpec, EMBED_OPTIONS)
     .then((result) => {
       console.log(`${name} loaded`);
-      const container = document.querySelector(selector);
-      if (container) {
-        const svg = container.querySelector('svg');
-        if (svg) {
-          svg.style.width = '100%';
-          svg.style.height = 'auto';
-          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        }
-      }
     })
     .catch(error => console.error(`${name} error:`, error));
 };
-const redditPopularityByYear = baseSpec({
+const redditEngagementVsSentimentBubble = baseSpec({
   transform: [
     {
-      filter: "year(datum.date_utc) >= 2020 && year(datum.date_utc) <= 2025"
+      calculate: "datum.score + datum.num_comments",
+      as: "engagement"
     },
     {
-      timeUnit: "year",
-      field: "date_utc",
-      as: "year"
+      aggregate: [
+        { op: "mean", field: "engagement", as: "avg_engagement" },
+        { op: "mean", field: "sentiment_score", as: "avg_sentiment" }
+      ],
+      groupby: ["subreddit"]
     }
   ],
-  mark: "line",
+  mark: { type: "circle", opacity: 1 },
   encoding: {
     x: {
-      field: "year",
-      type: "temporal",
-      title: "Year"
+      field: "avg_sentiment",
+      type: "quantitative",
+      title: "Average Sentiment (Negative → Positive)",
+      scale: { domain: [-0.2, 0.2] }
     },
     y: {
-      aggregate: "average",
-      field: "score",
+      field: "avg_engagement",
       type: "quantitative",
-      title: "Average Score",
-      scale: { domain: [50000, 200000] }
+      title: "Average Engagement"
+    },
+    size: {
+      field: "avg_engagement",
+      type: "quantitative",
+      title: "Bubble Size (Avg Engagement)",
+      scale: { range: [50, 2000] }
     },
     color: {
-      field: "subreddit",
-      type: "nominal",
-      title: "Subreddit"
+      field: "avg_sentiment",
+      type: "quantitative",
+      title: "Sentiment",
+      scale: { scheme: "redblue" }
     },
     tooltip: [
-      { field: "year", type: "temporal", title: "Year" },
-      { field: "subreddit", type: "nominal", title: "Subreddit" },
-      { aggregate: "average", field: "score", type: "quantitative", title: "Avg Score" }
+      { field: "subreddit", type: "nominal" },
+      { field: "avg_engagement", type: "quantitative" },
+      { field: "avg_sentiment", type: "quantitative" }
     ]
   },
-  width: 400,
-  height: CHART_HEIGHT
+  width: 500,
+  height: 400
 });
 
 const redditAvgSentimentBySubreddit = baseSpec({
@@ -194,7 +224,22 @@ const redditEngagementVsSentiment = baseSpec({
   height: CHART_HEIGHT
 });
 
-embed("#vis-popularity", redditPopularityByYear, "Vis 1");
+// Store original spec for resize handling
+let originalBubbleSpec = redditEngagementVsSentimentBubble;
+
+embed("#vis-popularity", redditEngagementVsSentimentBubble, "Vis 1");
 embed("#vis-sentiment-subreddit", redditAvgSentimentBySubreddit, "Vis 2");
 embed("#vis-sentiment-score", redditSentimentVsScore, "Vis 3");
 embed("#vis-engagement-sentiment", redditEngagementVsSentiment, "Vis 4");
+
+// Handle window resize for responsive visualization
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    const container = document.querySelector("#vis-popularity");
+    if (container && container.innerHTML) {
+      embed("#vis-popularity", originalBubbleSpec, "Vis 1");
+    }
+  }, 250);
+});

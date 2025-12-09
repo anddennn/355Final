@@ -284,37 +284,27 @@ section#title {
 
 .context-map .text {
     flex: 1;
+    min-width: 0;
 }
 
 .context-map .visualization {
-    flex: 1;
+    flex: 0 0 auto;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .context-map .visualization > div {
     width: 100%;
     overflow: hidden;
-    position: relative;
 }
 
-.context-map .visualization > div svg,
-.context-map .visualization > div canvas {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
-.context-map .visualization #vis-popularity {
+.context-map .visualization > div svg {
     width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-.context-map .visualization #vis-popularity svg {
-    width: 100% !important;
-    height: auto !important;
+    height: auto;
     max-width: 100%;
     display: block;
 }
+
 
 .subreddits.flex {
     display: flex;
@@ -370,6 +360,19 @@ a.button {
     background: #fafafa;
 }
 
+
+@media (max-width: 1280px) {
+    .context-map.flex {
+        flex-direction: column;
+        gap: 4vw;
+    }
+
+    .context-map .visualization {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 1024px) {
     .hero-container {
         width: 90vw;
@@ -390,6 +393,7 @@ a.button {
         padding-left: 5vw;
         padding-right: 5vw;
     }
+
 }
 
 @media (max-width: 768px) {
@@ -475,6 +479,11 @@ a.button {
     .context-map.flex {
         flex-direction: column;
         gap: 4vw;
+    }
+
+    .context-map .visualization {
+        min-width: 0;
+        width: 100%;
     }
 
     .vis-reflection-content.flex {
