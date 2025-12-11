@@ -38,6 +38,7 @@ body {
     background-color: var(--white);
     color: var(--black);
     line-height: 1.6;
+    max-width: 100rem;
 }
 
 h1,h2, h3 {
@@ -58,14 +59,14 @@ p.caption {
 }
 
 .chart {
-    flex: 1 1 320px;
+    flex: 1 1 20rem;
 }
 
 /* NAVBAR */
 
 nav {
     position: fixed;
-    top: 20px;
+    top: 1.25rem;
     left: 50%;
     transform: translateX(-50%);
     
@@ -87,7 +88,7 @@ nav {
 }
 
 nav a {
-    padding: 12px 28px;
+    padding: 0.75rem 1.75rem;
     text-decoration: none;
     color: black;
     text-align: center;
@@ -108,11 +109,11 @@ nav a:hover {
 
 nav a.wide {
     flex: 0 0 auto;
-    max-width: 300px;
+    max-width: 18.75rem;
 }
 
 nav .spacer {
-    width: 40px;
+    width: 2.5rem;
     height: 100%;
     background: transparent;
     border: none;
@@ -123,13 +124,13 @@ nav .spacer {
 
 h1 {
     font-size: 2rem;
-    margin: 20px;
+    margin: 1.25rem;
     text-align: center;
 }
 
 h2 {
     font-size: 1.6rem;
-    margin-bottom: 10px;
+    margin-bottom: 0.65rem;
 }
 
 h3 {
@@ -140,7 +141,7 @@ h3 {
 
 p {
     margin-bottom: 1rem;
-    max-width: 700px;
+    max-width: 43.75rem;
 }
 
 /* SECTIONS */
@@ -172,7 +173,7 @@ section#title {
     width: 80vw;
     margin: 0 auto;
     display: block;
-    min-height: 200px;
+    min-height: 12.5rem;
     margin-bottom: 2vw;
 }
 
@@ -197,9 +198,9 @@ section#title {
 
 .hero-heading {
     position: absolute;
-    top: 00px;
-    left: 0px;
-    padding: 20px 30px;
+    top: 0rem;
+    left: 0rem;
+    padding: 1.25rem 1.875rem;
     max-width: 50vw;
     z-index: 2;
     background: linear-gradient(to right, var(--white) 0%, var(--white) 70%, transparent 100%);
@@ -207,7 +208,7 @@ section#title {
 
 .hero-heading h1 {
     font-size: 3rem;
-    margin: 0 0 10px 0;
+    margin: 0 0 0.625rem 0;
     text-align: left;
 }
 
@@ -237,13 +238,13 @@ section#title {
 .hero-divider {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
-    height: 2px;
+    height: 0.125rem;
     background: repeating-linear-gradient(
         to right,
         var(--black) 0,
-        var(--black) 15px,
-        transparent 15px,
-        transparent 30px
+        var(--black) 0.9375rem,
+        transparent 0.9375rem,
+        transparent 1.875rem
     );
     margin-top: 3vw;
     margin-bottom: 3vw;
@@ -273,7 +274,7 @@ section#title {
     min-width: 150%;
     height: auto;
     display: block;
-    max-height: 500px;
+    max-height: 31.25rem;
 }
 
 .context-map.flex {
@@ -285,12 +286,19 @@ section#title {
 .context-map .text {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;  
+    height: 100%;
 }
 
 .context-map .visualization {
     flex: 0 0 auto;
     max-width: 100%;
     overflow: hidden;
+    background-color: #fff;
+    padding: 2.5rem;
+    justify-items: center;
 }
 
 .context-map .visualization > div {
@@ -306,6 +314,8 @@ section#title {
 }
 
 .sentiment-forecast {
+    padding: 4rem;
+    background-color: #fff;
     margin-top: 4vw;
     width: 100%;
 }
@@ -324,13 +334,13 @@ section#title {
 .subreddits.flex {
     display: flex;
     flex-wrap: nowrap;
-    gap: 10px;
+    gap: 0.625rem;
     overflow-x: auto;
 }
 
 .subreddit-button {
     display: inline-block;
-    padding: 10px 16px;
+    padding: 0.625rem 1rem;
     background: #e0e0e0;
     color: var(--black);
     text-decoration: none;
@@ -352,8 +362,8 @@ section#title {
 .button, 
 a.button {
     display: inline-block;
-    padding: 10px 16px;
-    margin-top: 10px;
+    padding: 0.625rem 1rem;
+    margin-top: 0.625rem;
     background: #EE5A24;
     color: white;
     text-decoration: none;
@@ -369,39 +379,47 @@ a.button {
 .datasetVisualizations,
 .taskVisualization div {
     border: 1px solid #ddd;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 8px;
+    padding: 1.25rem;
+    margin-top: 0.9375rem;
+    border-radius: 0.5rem;
     background: #fafafa;
 }
 
 
 .final-visualization{
     display: flex;
-    gap: 40px;
+    justify-content: space-between;
 }
 
-.viz-panel{
-    width:60%;
+#viz-panel {
+    width: fit-content;
+    background-color: #fff;
+    padding: 3.125rem;
 }
 
-#visualization-area {
-    width: 100%;
-    height: 500px;
-    border: 1px solid #ddd;
-    background: #fff;
+#vizualization-area {
+    width: fit-content;
 }
 
 .text-panel {
-    width: 40%;
+    width: 50%;
     display: flex;
     flex-direction: column;
 }
 
 select {
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 16px;
+    padding: 0.625rem;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+}
+
+.callout{
+    background-color: #f0f0f0;
+    border-left: 0.3125rem solid #EE5A24;
+    padding: 1rem 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
 }
 
 #explanation-text {
@@ -411,7 +429,7 @@ select {
 
 /* MEDIA QUERIES *************************/
 
-@media (max-width: 1280px) {
+@media (max-width: 80rem) {
     .context-map.flex {
         flex-direction: column;
         gap: 4vw;
@@ -423,10 +441,10 @@ select {
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 64rem) {
     .hero-container {
         width: 90vw;
-        min-height: 250px;
+        min-height: 15.625rem;
     }
 
     .hero-content {
@@ -446,21 +464,21 @@ select {
 
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
     nav {
         flex-wrap: wrap;
-        gap: 5px;
-        top: 10px;
+        gap: 0.3125rem;
+        top: 0.625rem;
         max-width: 95%;
     }
 
     nav a {
         font-size: 0.85rem;
-        padding: 10px 16px;
+        padding: 0.625rem 1rem;
     }
 
     nav a.wide {
-        max-width: 200px;
+        max-width: 12.5rem;
     }
 
     .hero-container {
@@ -480,7 +498,7 @@ select {
     .hero-heading {
         position: relative;
         max-width: 100%;
-        padding: 15px 20px;
+        padding: 0.9375rem 1.25rem;
         margin-bottom: 2vw;
     }
 
@@ -510,7 +528,7 @@ select {
 
     section#title {
         min-height: auto;
-        padding-top: 80px;
+        padding-top: 5rem;
         padding-bottom: 6vw;
     }
 
@@ -556,27 +574,27 @@ select {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 30rem) {
     nav {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        top: 5px;
+        top: 0.3125rem;
         max-width: 98%;
     }
 
     nav a {
-        padding: 8px 12px;
+        padding: 0.5rem 0.75rem;
         font-size: 0.75rem;
     }
 
     nav a.wide {
-        max-width: 150px;
+        max-width: 9.375rem;
         flex: 0 0 auto;
     }
 
     .hero-heading {
-        padding: 12px 15px;
+        padding: 0.75rem 0.9375rem;
     }
 
     .hero-heading h1 {
@@ -600,12 +618,12 @@ select {
     }
 
     section#title {
-        padding-top: 70px;
+        padding-top: 4.375rem;
     }
 
     h1 {
         font-size: 1.5rem;
-        margin: 10px;
+        margin: 0.625rem;
     }
 
     h2 {
@@ -621,7 +639,7 @@ select {
     }
 
     .subreddit-button {
-        padding: 8px 12px;
+        padding: 0.5rem 0.75rem;
         font-size: 0.85rem;
     }
 
@@ -630,7 +648,7 @@ select {
     }
 
     .timeline-image {
-        max-height: 300px;
+        max-height: 18.75rem;
     }
 
     footer {

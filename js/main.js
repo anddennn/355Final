@@ -79,13 +79,20 @@ const redditEngagementVsSentimentBubble = baseSpec({
     y: {
       field: "avg_engagement",
       type: "quantitative",
-      title: "Average Engagement"
+      title: "Average Engagement",
+        axis: {
+          labelExpr:
+            "datum.value >= 1e9 ? (datum.value/1e9 + 'B') : " +
+            "datum.value >= 1e6 ? (datum.value/1e6 + 'M') : " +
+            "datum.value >= 1e3 ? (datum.value/1e3 + 'k') : datum.value"
+        }
     },
     size: {
       field: "avg_engagement",
       type: "quantitative",
       title: "Bubble Size (Avg Engagement)",
-      scale: { range: [50, 2000] }
+      scale: { range: [50, 2000] },
+      legend: null
     },
     color: {
       field: "avg_sentiment",
@@ -95,8 +102,8 @@ const redditEngagementVsSentimentBubble = baseSpec({
     },
     tooltip: [
       { field: "subreddit", type: "nominal" },
-      { field: "avg_engagement", type: "quantitative" },
-      { field: "avg_sentiment", type: "quantitative" }
+      { field: "avg_engagement", type: "quantitative",format: ".2~s" },
+      { field: "avg_sentiment", type: "quantitative", format: ".2f" }
     ]
   },
   width: 500,
@@ -193,7 +200,8 @@ const redditEngagementVsSentiment = baseSpec({
     y: {
       field: "avg_engagement",
       type: "quantitative",
-      title: "Average Engagement"
+      title: "Average Engagement",
+      axis: { format: ".2~s" }
     },
     size: {
       field: "avg_engagement",
@@ -263,6 +271,7 @@ const redditSentimentEmotions = {
       field: "avg_engagement",
       type: "quantitative",
       title: "Average Engagement (Upvotes)",
+      format: ".2~s",
       scale: { zero: false, padding: 0.2 }
     }
   },
