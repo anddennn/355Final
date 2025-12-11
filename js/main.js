@@ -1,4 +1,4 @@
-const DATA_URL = "../Reddit Posts 2015-2025.csv";
+const DATA_URL = "./Reddit Posts 2015-2025.csv";
 const SCHEMA = "https://vega.github.io/schema/vega-lite/v5.json";
 const CHART_HEIGHT = 280;
 const EMBED_OPTIONS = { actions: false };
@@ -18,7 +18,7 @@ const getResponsiveWidth = (baseWidth, selector) => {
   
   const sectionWidth = section.offsetWidth;
   const padding = parseFloat(getComputedStyle(section).paddingLeft) + 
-                   parseFloat(getComputedStyle(section).paddingRight);
+                  parseFloat(getComputedStyle(section).paddingRight);
   
   if (window.innerWidth <= 1280) {
     const availableWidth = sectionWidth - padding;
@@ -357,3 +357,107 @@ window.addEventListener('resize', () => {
     }
   }, 250);
 });
+
+// final visualizations
+let fullData = null;   // <-- global so updateVisualization() can access it
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+    // Load CSV once
+    fullData = await d3.csv("Reddit Posts 2015-2025.csv", d3.autoType);
+
+    // Draw the default subreddit
+    updateVisualization("technology");
+});
+
+
+// ----------- MAIN UPDATE FUNCTION -----------
+function updateVisualization(selectedSubreddit) {
+
+    // Filter dataset to selected subreddit
+    const posts = fullData.filter(d => d.subreddit === selectedSubreddit);
+
+    // Update right-panel text (you can customize this later)
+    document.getElementById("subreddit-title").textContent = `r/${selectedSubreddit}`;
+    document.getElementById("sentiment-stats").textContent =
+        `${percent(posts, "negative")}% Negative, ` +
+        `${percent(posts, "neutral")}% Neutral, ` +
+        `${percent(posts, "positive")}% Positive`;
+
+    // Clear old visualization
+    const viz = document.getElementById("visualization-area");
+    viz.innerHTML = "";
+
+    // ----- DRAW BUBBLE GRID -----
+
+    const width = 400;
+    const height = 400;
+    const radius = 10;
+    const padding = 4;
+    const columns = Math.floor(width / (radius * 2 + padding));
+
+    const sentimentOrder = ["negative", "neutral", "positive"];
+
+    posts.sort((a, b) =>
+        sentimentOrder.indexOf(a.sentiment_name) -
+        sentimentOrder.indexOf(b.sentiment_name)
+    );
+
+    posts.forEach((d, i) => {
+        d.x = (i % columns) * (radius * 2 + padding) + radius;
+        d.y = Math.floor(i / columns) * (radius * 2 + padding) + radius;
+    });
+
+    const color = {
+        positive: "#4CAF50",
+        neutral: "#CFCFCF",
+        negative: "#E74C3C"
+    };
+
+    // Tooltip
+    const tooltip = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip");
+
+    // SVG container
+    const svg = d3.select("#visualization-area")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    // Draw circles
+    svg.selectAll("circle")
+        .data(posts)
+        .join("circle")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", radius)
+        .attr("fill", d => color[d.sentiment_name])
+        .on("mouseover", (event, d) => {
+            tooltip
+                .style("opacity", 1)
+                .html(`
+                    <strong>${d.sentiment_name.toUpperCase()}</strong><br>
+                    ${d.title || "(no title)"}
+                `);
+        })
+        .on("mousemove", event => {
+            tooltip
+                .style("left", (event.pageX + 12) + "px")
+                .style("top", (event.pageY + 12) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+}
+
+
+// ------ DROPDOWN LISTENER ------
+document.getElementById("subreddit-select").addEventListener("change", (e) => {
+    updateVisualization(e.target.value);
+});
+
+
+// ------ HELPERS ------
+function percent(posts, sentiment) {
+    const count = posts.filter(d => d.sentiment_name === sentiment).length;
+    return Math.round((count / posts.length) * 100);
+}

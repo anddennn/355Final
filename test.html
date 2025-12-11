@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Technology Sentiment Grid</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+
+    .tooltip {
+      position: absolute;
+      background: white;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Technology Subreddit Sentiment Grid</h2>
+  <div id="visContainer"></div>
+
+  <script>
+    (async function() {
+      
+      const data = await d3.csv("Reddit Posts 2015-2025.csv", d3.autoType);
+
+      // Filter to only the technology subreddit
+      let posts = data.filter(d => d.subreddit === "technology");
+
+      // Color mapping based on sentiment_name
+      const color = {
+        positive: "#4CAF50",
+        neutral: "#CFCFCF",
+        negative: "#E74C3C"
+      };
+
+      // Grid layout settings
+      const width = 400;
+      const height = 400;
+      const radius = 10;
+      const padding = 4;
+      const columns = Math.floor(width / (radius * 2 + padding));
+
+      // Sort posts by sentiment
+      const sentimentOrder = ["negative", "neutral", "positive"];
+      posts.sort((a, b) => sentimentOrder.indexOf(a.sentiment_name) - sentimentOrder.indexOf(b.sentiment_name));
+
+      // x/y positions 
+      posts.forEach((d, i) => {
+        d.x = (i % columns) * (radius * 2 + padding) + radius;
+        d.y = Math.floor(i / columns) * (radius * 2 + padding) + radius;
+      });
+
+      // Create tooltip
+      const tooltip = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip");
+
+      // container
+      const svg = d3.select("#visContainer")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      // bubbles
+      svg.selectAll("circle")
+        .data(posts)
+        .join("circle")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", radius)
+        .attr("fill", d => color[d.sentiment_name])
+        .on("mouseover", (event, d) => {
+          tooltip
+            .style("opacity", 1)
+            .html(`
+              <strong>${d.sentiment_name.toUpperCase()}</strong><br>
+              ${d.title || "(no title)"}
+            `);
+        })
+        .on("mousemove", event => {
+          tooltip
+            .style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY + 12) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+
+    })();
+  </script>
+</body>
+</html>
