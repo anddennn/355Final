@@ -696,3 +696,68 @@ footer p {
     margin: 0.5rem 0;
     color: #666;
 }
+
+.tooltip {
+    position: absolute;
+    background: white;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1000;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    line-height: 1.5;
+}
+
+.tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.tooltip-header strong {
+    color: #333;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tooltip-date {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.tooltip-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #222;
+    font-size: 0.9rem;
+}
+
+.tooltip-body {
+    margin-bottom: 0.75rem;
+    color: #444;
+    font-size: 0.85rem;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.tooltip-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #666;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+.tooltip-meta span {
+    white-space: nowrap;
+}

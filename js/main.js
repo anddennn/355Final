@@ -423,10 +423,13 @@ function updateVisualization(selectedSubreddit) {
         negative: "#E74C3C"
     };
 
-    // Tooltip
-    const tooltip = d3.select("body")
-        .append("div")
-        .attr("class", "tooltip");
+    // Tooltip (create only if it doesn't exist)
+    let tooltip = d3.select("body").select(".tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip");
+    }
 
     // SVG container
     const svg = d3.select("#visualization-area")
@@ -443,11 +446,25 @@ function updateVisualization(selectedSubreddit) {
         .attr("r", radius)
         .attr("fill", d => color[d.sentiment_name])
         .on("mouseover", (event, d) => {
+            const postBody = d.body || d.selftext || d.text || "";
+            const postTitle = d.title || "(no title)";
+            const postDate = d.date_utc ? new Date(d.date_utc).toLocaleDateString() : "Unknown date";
+            const postScore = d.score !== undefined ? d.score.toLocaleString() : "N/A";
+            const postComments = d.num_comments !== undefined ? d.num_comments.toLocaleString() : "N/A";
+            
             tooltip
                 .style("opacity", 1)
                 .html(`
-                    <strong>${d.sentiment_name.toUpperCase()}</strong><br>
-                    ${d.title || "(no title)"}
+                    <div class="tooltip-header">
+                        <strong>${d.sentiment_name.toUpperCase()}</strong>
+                        <span class="tooltip-date">${postDate}</span>
+                    </div>
+                    <div class="tooltip-title">${postTitle}</div>
+                    ${postBody ? `<div class="tooltip-body">${postBody.substring(0, 500)}${postBody.length > 500 ? '...' : ''}</div>` : ''}
+                    <div class="tooltip-meta">
+                        <span>Score: ${postScore}</span>
+                        <span>Comments: ${postComments}</span>
+                    </div>
                 `);
         })
         .on("mousemove", event => {
