@@ -396,8 +396,16 @@ a.button {
     padding: 3.125rem;
 }
 
-#vizualization-area {
-    width: fit-content;
+#visualization-area {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#visualization-area svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
 }
 
 .text-panel {
@@ -551,6 +559,7 @@ select {
     .context-map .visualization {
         min-width: 0;
         width: 100%;
+        padding: 1.5rem;
     }
 
     .vis-reflection-content.flex {
@@ -570,6 +579,38 @@ select {
     footer {
         padding: 3vw 5vw;
         padding-bottom: 4vw;
+    }
+
+    .sentiment-forecast {
+        padding: 1rem 0.5rem;
+    }
+
+    .sentiment-forecast > div {
+        padding: 0;
+        overflow: visible;
+    }
+
+    .sentiment-forecast > div svg {
+        margin: 0;
+    }
+
+    .final-visualization {
+        flex-direction: column;
+    }
+
+    #viz-panel {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    #visualization-area {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .text-panel {
+        width: 100%;
+        margin-top: 2rem;
     }
 }
 
@@ -657,6 +698,36 @@ select {
 
     footer p {
         font-size: 0.85rem;
+    }
+
+    .sentiment-forecast {
+        padding: 0.75rem;
+    }
+
+    #viz-panel {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 20rem) {
+    .sentiment-forecast {
+        padding: 0.5rem;
+    }
+
+    #viz-panel {
+        padding: 0.75rem;
+    }
+
+    #visualization-area {
+        max-width: 100%;
+    }
+
+    .text-panel {
+        margin-top: 1rem;
+    }
+
+    .context-map .visualization {
+        padding: 1rem;
     }
 }
 

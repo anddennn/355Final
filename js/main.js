@@ -110,16 +110,19 @@ const redditEngagementVsSentimentBubble = baseSpec({
   height: 400
 });
 
-const redditAvgSentimentBySubreddit = baseSpec({
-  mark: "bar",
-  encoding: {
-    x: { field: "subreddit", type: "nominal", title: "Subreddit", sort: "-y" },
-    y: {
-      aggregate: "mean",
-      field: "sentiment_score",
-      type: "quantitative",
-      title: "Average sentiment score (-1 = negative, +1 = positive)"
-    },
+const getAvgSentimentSpec = () => {
+  const isTabletOrSmaller = window.innerWidth <= 768;
+  
+  return baseSpec({
+    mark: "bar",
+    encoding: {
+      x: { field: "subreddit", type: "nominal", title: "Subreddit", sort: "-y" },
+      y: {
+        aggregate: "mean",
+        field: "sentiment_score",
+        type: "quantitative",
+        title: isTabletOrSmaller ? "Avg Sentiment (-1 to +1)" : "Average sentiment score (-1 = negative, +1 = positive)"
+      },
     color: {
       aggregate: "mean",
       field: "sentiment_score",
@@ -135,7 +138,11 @@ const redditAvgSentimentBySubreddit = baseSpec({
   },
   width: 400,
   height: CHART_HEIGHT
-});
+  });
+};
+
+// Note: Use getAvgSentimentSpec() or embedAvgSentiment() for responsive title
+// The function checks window width dynamically, so it will update on resize
 
 const redditSentimentVsScore = baseSpec({
   selection: {
@@ -227,89 +234,140 @@ const redditEngagementVsSentiment = baseSpec({
   height: CHART_HEIGHT
 });
 
-const redditSentimentEmotions = {
-  $schema: SCHEMA,
-  data: { url: DATA_URL },
-  width: "container",
-  height: 400,
-  params: [
-    {
-      name: "Select_Subreddit",
-      value: "AskReddit"
-    }
-  ],
-  transform: [
-    { filter: { field: "subreddit", equal: { expr: "Select_Subreddit" } } },
-    { timeUnit: "year", field: "date_utc", as: "year" },
-    {
-      calculate: "year(datum.year)",
-      as: "year_number"
-    },
-    {
-      aggregate: [
-        { op: "mean", field: "sentiment_score", as: "avg_sentiment" },
-        { op: "mean", field: "score", as: "avg_engagement" }
-      ],
-      groupby: ["year_number"]
-    },
-    {
-      calculate: "datum.avg_sentiment > 0.3 ? '🤩' : datum.avg_sentiment > 0.2 ? '😄' : datum.avg_sentiment > 0.1 ? '😊' : datum.avg_sentiment > 0.05 ? '🙂' : datum.avg_sentiment > -0.05 ? '😐' : datum.avg_sentiment > -0.1 ? '😕' : datum.avg_sentiment > -0.2 ? '😟' : datum.avg_sentiment > -0.3 ? '😠' : '🤬'",
-      as: "emotion_emoji"
-    }
-  ],
-  encoding: {
-    x: {
-      field: "year_number",
-      type: "ordinal",
-      title: "Year",
-      axis: { 
-        labelAngle: 0, 
-        labelFontSize: 12
+const getSentimentEmotionsSpec = () => {
+  const isMobile = window.innerWidth <= 480;
+  
+  return {
+    $schema: SCHEMA,
+    data: { url: DATA_URL },
+    width: "container",
+    height: 400,
+    params: [
+      {
+        name: "Select_Subreddit",
+        value: "AskReddit"
+      }
+    ],
+    transform: [
+      { filter: { field: "subreddit", equal: { expr: "Select_Subreddit" } } },
+      { timeUnit: "year", field: "date_utc", as: "year" },
+      {
+        calculate: "year(datum.year)",
+        as: "year_number"
+      },
+      {
+        aggregate: [
+          { op: "mean", field: "sentiment_score", as: "avg_sentiment" },
+          { op: "mean", field: "score", as: "avg_engagement" }
+        ],
+        groupby: ["year_number"]
+      },
+      {
+        calculate: "datum.avg_sentiment > 0.3 ? '🤩' : datum.avg_sentiment > 0.2 ? '😄' : datum.avg_sentiment > 0.1 ? '😊' : datum.avg_sentiment > 0.05 ? '🙂' : datum.avg_sentiment > -0.05 ? '😐' : datum.avg_sentiment > -0.1 ? '😕' : datum.avg_sentiment > -0.2 ? '😟' : datum.avg_sentiment > -0.3 ? '😠' : '🤬'",
+        as: "emotion_emoji"
+      }
+    ],
+    encoding: {
+      x: {
+        field: "year_number",
+        type: "ordinal",
+        title: "Year",
+        axis: { 
+          labelAngle: isMobile ? -90 : 0, 
+          labelFontSize: isMobile ? 10 : 12
+        }
+      },
+      y: {
+        field: "avg_engagement",
+        type: "quantitative",
+        title: "Average Engagement (Upvotes)",
+        axis: { 
+          format: isMobile ? ".0s" : ".2s"
+        },
+        scale: { zero: false, padding: 0.2 }
       }
     },
-    y: {
-      field: "avg_engagement",
-      type: "quantitative",
-      title: "Average Engagement (Upvotes)",
-      format: ".2~s",
-      scale: { zero: false, padding: 0.2 }
-    }
-  },
-  layer: [
-    {
-      mark: { type: "line", interpolate: "monotone", color: "#e0e0e0", strokeWidth: 2 }
-    },
-    {
-      mark: { type: "circle", size: 3000, opacity: .4, yOffset: -3 },
-      encoding: {
-        color: {
-          field: "avg_sentiment",
-          type: "quantitative",
-          scale: { 
-            scheme: "RdYlGn",
-            domainMid: 0,
-            range: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"]
-          },
-          legend: { title: "Avg Sentiment" }
+    layer: [
+      {
+        mark: { type: "line", interpolate: "monotone", color: "#e0e0e0", strokeWidth: 2 }
+      },
+      {
+        mark: { type: "circle", size: isMobile ? 1500 : 3000, opacity: .4, yOffset: -3 },
+        encoding: {
+          color: {
+            field: "avg_sentiment",
+            type: "quantitative",
+            scale: { 
+              scheme: "RdYlGn",
+              domainMid: 0,
+              range: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"]
+            },
+            legend: isMobile ? null : { title: "Avg Sentiment" }
+          }
+        }
+      },
+      {
+        mark: { type: "text", fontSize: isMobile ? 24 : 40, baseline: "middle" },
+        encoding: {
+          text: { field: "emotion_emoji" },
+          tooltip: [
+            { field: "avg_engagement", title: "Avg Engagement", format: ".2~s" },
+            { field: "avg_sentiment", title: "Sentiment Score", format: ".3f" }
+          ]
         }
       }
-    },
-    {
-      mark: { type: "text", fontSize: 40, baseline: "middle" },
-      encoding: {
-        text: { field: "emotion_emoji" },
-        tooltip: [
-          { field: "avg_engagement", title: "Avg Engagement", format: ",.0f" },
-          { field: "avg_sentiment", title: "Sentiment Score", format: ".3f" }
-        ]
+    ]
+  };
+};
+
+const getBubbleSpec = () => {
+  const isMobile = window.innerWidth <= 480;
+  const isTabletOrSmaller = window.innerWidth <= 768;
+  
+  if (isTabletOrSmaller) {
+    const container = document.querySelector("#vis-popularity");
+    if (container) {
+      const section = container.closest('section');
+      if (section) {
+        const sectionWidth = section.offsetWidth;
+        const padding = parseFloat(getComputedStyle(section).paddingLeft) + 
+                       parseFloat(getComputedStyle(section).paddingRight);
+        const vizPadding = parseFloat(getComputedStyle(container.closest('.visualization')).paddingLeft) + 
+                          parseFloat(getComputedStyle(container.closest('.visualization')).paddingRight);
+        const availableWidth = sectionWidth - padding - vizPadding;
+        
+        let scaledWidth;
+        if (isMobile) {
+          scaledWidth = Math.min(280, Math.max(250, availableWidth - 10));
+        } else {
+          scaledWidth = Math.min(350, Math.max(280, availableWidth - 15));
+        }
+        const scaledHeight = Math.round((400 / 500) * scaledWidth);
+        
+        return {
+          ...redditEngagementVsSentimentBubble,
+          width: scaledWidth,
+          height: scaledHeight
+        };
       }
     }
-  ]
+  }
+  
+  return {
+    ...redditEngagementVsSentimentBubble,
+    width: getResponsiveWidth(500, "#vis-popularity"),
+    height: Math.round((400 / 500) * getResponsiveWidth(500, "#vis-popularity"))
+  };
 };
 
 const originalBubbleSpec = redditEngagementVsSentimentBubble;
 
-embed("#vis-popularity", redditEngagementVsSentimentBubble, "Vis 1");
+const embedBubbleViz = () => {
+  const spec = getBubbleSpec();
+  embed("#vis-popularity", spec, "Vis 1");
+};
+
+embedBubbleViz();
 
 let weatherView = null;
 
@@ -341,13 +399,21 @@ const setupSubredditButtons = () => {
   });
 };
 
-vegaEmbed("#vis-weather", redditSentimentEmotions, EMBED_OPTIONS)
-  .then((result) => {
-    weatherView = result.view;
-    console.log("Vis Weather loaded");
-    setupSubredditButtons();
-  })
-  .catch(error => console.error("Vis Weather error:", error));
+const embedSentimentEmotions = () => {
+  const spec = getSentimentEmotionsSpec();
+  const currentSubreddit = weatherView ? weatherView.signal("Select_Subreddit") : "AskReddit";
+  spec.params[0].value = currentSubreddit;
+  
+  vegaEmbed("#vis-weather", spec, EMBED_OPTIONS)
+    .then((result) => {
+      weatherView = result.view;
+      console.log("Vis Weather loaded");
+      setupSubredditButtons();
+    })
+    .catch(error => console.error("Vis Weather error:", error));
+};
+
+embedSentimentEmotions();
 
 document.addEventListener('DOMContentLoaded', () => {
   if (weatherView) {
@@ -355,13 +421,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+const embedAvgSentiment = () => {
+  const spec = getAvgSentimentSpec();
+  embed("#vis-sentiment-subreddit", spec, "Avg Sentiment");
+};
+
+// Embed if container exists
+const sentimentSubredditContainer = document.querySelector("#vis-sentiment-subreddit");
+if (sentimentSubredditContainer) {
+  embedAvgSentiment();
+}
+
 let resizeTimeout;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     const container = document.querySelector("#vis-popularity");
     if (container && container.innerHTML) {
-      embed("#vis-popularity", originalBubbleSpec, "Vis 1");
+      embedBubbleViz();
+    }
+    const weatherContainer = document.querySelector("#vis-weather");
+    if (weatherContainer && weatherContainer.innerHTML) {
+      embedSentimentEmotions();
+    }
+    const sentimentContainer = document.querySelector("#vis-sentiment-subreddit");
+    if (sentimentContainer && sentimentContainer.innerHTML) {
+      embedAvgSentiment();
+    }
+    // Update bubble grid visualization on resize
+    const selectElement = document.getElementById("subreddit-select");
+    if (selectElement && fullData) {
+      const currentSubreddit = selectElement.value;
+      updateVisualization(currentSubreddit);
     }
   }, 250);
 });
@@ -397,11 +488,31 @@ function updateVisualization(selectedSubreddit) {
     viz.innerHTML = "";
 
     // ----- DRAW BUBBLE GRID -----
-
-    const width = 400;
-    const height = 400;
-    const radius = 10;
-    const padding = 4;
+    
+    // Calculate responsive dimensions
+    const isMobile = window.innerWidth <= 480;
+    const isTablet = window.innerWidth <= 768;
+    
+    let width, height, radius, padding;
+    if (isMobile) {
+        const container = document.getElementById("visualization-area");
+        const containerWidth = container ? container.offsetWidth : 280;
+        width = Math.min(280, Math.max(250, containerWidth - 20));
+        height = width; // Keep it square
+        radius = 6;
+        padding = 3;
+    } else if (isTablet) {
+        width = 350;
+        height = 350;
+        radius = 8;
+        padding = 3.5;
+    } else {
+        width = 400;
+        height = 400;
+        radius = 10;
+        padding = 4;
+    }
+    
     const columns = Math.floor(width / (radius * 2 + padding));
 
     const sentimentOrder = ["negative", "neutral", "positive"];
