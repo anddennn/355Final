@@ -299,7 +299,6 @@ const redditSentimentEmotions = {
       encoding: {
         text: { field: "emotion_emoji" },
         tooltip: [
-          { field: "year", title: "Year", timeUnit: "year" },
           { field: "avg_engagement", title: "Avg Engagement", format: ",.0f" },
           { field: "avg_sentiment", title: "Sentiment Score", format: ".3f" }
         ]
