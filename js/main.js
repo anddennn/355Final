@@ -68,44 +68,121 @@ const redditEngagementVsSentimentBubble = baseSpec({
       groupby: ["subreddit"]
     }
   ],
-  mark: { type: "circle", opacity: 1 },
-  encoding: {
-    x: {
-      field: "avg_sentiment",
-      type: "quantitative",
-      title: "Average Sentiment (Negative → Positive)",
-      scale: { domain: [-0.2, 0.2] }
+
+  layer: [
+    {
+      mark: { type: "circle", opacity: 1 },
+      encoding: {
+        x: {
+          field: "avg_sentiment",
+          type: "quantitative",
+          title: "Average Sentiment (Negative → Positive)",
+          scale: { domain: [-0.2, 0.2] }
+        },
+        y: {
+          field: "avg_engagement",
+          type: "quantitative",
+          title: "Average Engagement",
+          axis: {
+            labelExpr:
+              "datum.value >= 1e9 ? (datum.value/1e9 + 'B') : " +
+              "datum.value >= 1e6 ? (datum.value/1e6 + 'M') : " +
+              "datum.value >= 1e3 ? (datum.value/1e3 + 'k') : datum.value"
+          }
+        },
+        size: {
+          field: "avg_engagement",
+          type: "quantitative",
+          scale: { range: [50, 2000] },
+          legend: null
+        },
+        color: {
+          field: "avg_sentiment",
+          type: "quantitative",
+          title: "Sentiment",
+          scale: { scheme: "redblue" }
+        },
+        tooltip: [
+          { field: "subreddit", type: "nominal", title: "Subreddit" },
+          { field: "avg_engagement", type: "quantitative", format: ".2~s", title: "Avg Engagement" },
+          { field: "avg_sentiment", type: "quantitative", format: ".2f", title: "Avg Sentiment" }
+        ]
+      }
     },
-    y: {
-      field: "avg_engagement",
-      type: "quantitative",
-      title: "Average Engagement",
-        axis: {
-          labelExpr:
-            "datum.value >= 1e9 ? (datum.value/1e9 + 'B') : " +
-            "datum.value >= 1e6 ? (datum.value/1e6 + 'M') : " +
-            "datum.value >= 1e3 ? (datum.value/1e3 + 'k') : datum.value"
-        }
+    {transform: [
+        { filter: "datum.subreddit !== 'AskReddit' && datum.subreddit !== 'pics'  && datum.subreddit !== 'sports'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -14,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
     },
-    size: {
-      field: "avg_engagement",
-      type: "quantitative",
-      title: "Bubble Size (Avg Engagement)",
-      scale: { range: [50, 2000] },
-      legend: null
+    {
+      transform: [
+        { filter: "datum.subreddit === 'AskReddit'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -28,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
     },
-    color: {
-      field: "avg_sentiment",
-      type: "quantitative",
-      title: "Sentiment",
-      scale: { scheme: "redblue" }
+
+    {
+      transform: [
+        { filter: "datum.subreddit === 'pics'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -20,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
     },
-    tooltip: [
-      { field: "subreddit", type: "nominal" },
-      { field: "avg_engagement", type: "quantitative",format: ".2~s" },
-      { field: "avg_sentiment", type: "quantitative", format: ".2f" }
-    ]
-  },
+    {
+      transform: [
+        { filter: "datum.subreddit === 'sports'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -10,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
+    }
+  ],
+
   width: 500,
   height: 400
 });
@@ -567,8 +644,8 @@ function updateVisualization(selectedSubreddit) {
                 .html(`
                     <div class="tooltip-header">
                         <strong class="sentiment ${d.sentiment_name}">
-                          ${d.sentiment_name.toUpperCase()}
-                        </strong>
+                      ${d.sentiment_name.toUpperCase()}
+                    </strong>
                         <span class="tooltip-date">${postDate}</span>
                     </div>
                     <div class="tooltip-title">${postTitle}</div>
