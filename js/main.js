@@ -311,7 +311,57 @@ const redditEngagementVsSentiment = baseSpec({
   height: CHART_HEIGHT
 });
 
-const getSentimentEmotionsSpec = () => {
+let globalEngagementDomain = null;
+
+const calculateGlobalEngagementDomain = async () => {
+  if (globalEngagementDomain) return globalEngagementDomain;
+  
+  try {
+    const data = await d3.csv(DATA_URL);
+    
+    // Group by year and subreddit, then calculate avg_engagement for each group
+    const grouped = d3.group(data, d => {
+      const date = new Date(d.date_utc);
+      if (isNaN(date.getTime())) return null;
+      const year = date.getFullYear();
+      return `${year}_${d.subreddit}`;
+    });
+    
+    const avgEngagements = Array.from(grouped.entries())
+      .filter(([key]) => key !== null)
+      .map(([_, group]) => {
+        const scores = group.map(d => {
+          const score = +d.score;
+          return isNaN(score) ? null : score;
+        }).filter(v => v !== null && v >= 0);
+        
+        return scores.length > 0 ? d3.mean(scores) : null;
+      })
+      .filter(v => v !== null && !isNaN(v) && v >= 0);
+    
+    if (avgEngagements.length === 0) {
+      globalEngagementDomain = [0, 1000];
+      return globalEngagementDomain;
+    }
+    
+    const min = d3.min(avgEngagements);
+    const max = d3.max(avgEngagements);
+    
+    // Add some padding to the domain
+    const padding = (max - min) * 0.1;
+    globalEngagementDomain = [
+      Math.max(0, min - padding),
+      max + padding
+    ];
+    
+    return globalEngagementDomain;
+  } catch (error) {
+    console.error("Error calculating global engagement domain:", error);
+    return [0, 1000];
+  }
+};
+
+const getSentimentEmotionsSpec = (yDomain = null) => {
   const isMobile = window.innerWidth <= 480;
   
   return {
@@ -361,7 +411,11 @@ const getSentimentEmotionsSpec = () => {
         axis: { 
           format: isMobile ? ".0s" : ".2s"
         },
-        scale: { zero: false, padding: 0.2 }
+        scale: { 
+          zero: false, 
+          padding: 0.2,
+          ...(yDomain ? { domain: yDomain } : {})
+        }
       }
     },
     layer: [
@@ -476,8 +530,9 @@ const setupSubredditButtons = () => {
   });
 };
 
-const embedSentimentEmotions = () => {
-  const spec = getSentimentEmotionsSpec();
+const embedSentimentEmotions = async () => {
+  const yDomain = await calculateGlobalEngagementDomain();
+  const spec = getSentimentEmotionsSpec(yDomain);
   const currentSubreddit = weatherView ? weatherView.signal("Select_Subreddit") : "AskReddit";
   spec.params[0].value = currentSubreddit;
   
@@ -490,7 +545,7 @@ const embedSentimentEmotions = () => {
     .catch(error => console.error("Vis Weather error:", error));
 };
 
-embedSentimentEmotions();
+embedSentimentEmotions().catch(error => console.error("Error embedding weather:", error));
 
 document.addEventListener('DOMContentLoaded', () => {
   if (weatherView) {
@@ -517,10 +572,10 @@ window.addEventListener('resize', () => {
     if (container && container.innerHTML) {
       embedBubbleViz();
     }
-    const weatherContainer = document.querySelector("#vis-weather");
-    if (weatherContainer && weatherContainer.innerHTML) {
-      embedSentimentEmotions();
-    }
+      const weatherContainer = document.querySelector("#vis-weather");
+      if (weatherContainer && weatherContainer.innerHTML) {
+        embedSentimentEmotions().catch(error => console.error("Error re-embedding weather:", error));
+      }
     const sentimentContainer = document.querySelector("#vis-sentiment-subreddit");
     if (sentimentContainer && sentimentContainer.innerHTML) {
       embedAvgSentiment();
