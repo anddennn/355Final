@@ -566,7 +566,9 @@ function updateVisualization(selectedSubreddit) {
                 .style("opacity", 1)
                 .html(`
                     <div class="tooltip-header">
-                        <strong>${d.sentiment_name.toUpperCase()}</strong>
+                        <strong class="sentiment ${d.sentiment_name}">
+                          ${d.sentiment_name.toUpperCase()}
+                        </strong>
                         <span class="tooltip-date">${postDate}</span>
                     </div>
                     <div class="tooltip-title">${postTitle}</div>

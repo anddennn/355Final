@@ -831,3 +831,12 @@ footer p {
 .tooltip-meta span {
     white-space: nowrap;
 }
+
+
+.sentiment.positive {
+  color: #4CAF50;
+}
+
+.sentiment.negative {
+  color: #E74C3C;
+}
