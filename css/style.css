@@ -333,9 +333,8 @@ section#title {
 
 .subreddits.flex {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.625rem;
-    overflow-x: auto;
 }
 
 .subreddit-button {
@@ -397,8 +396,16 @@ a.button {
     padding: 3.125rem;
 }
 
-#vizualization-area {
-    width: fit-content;
+#visualization-area {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#visualization-area svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
 }
 
 .text-panel {
@@ -552,6 +559,7 @@ select {
     .context-map .visualization {
         min-width: 0;
         width: 100%;
+        padding: 1.5rem;
     }
 
     .vis-reflection-content.flex {
@@ -571,6 +579,38 @@ select {
     footer {
         padding: 3vw 5vw;
         padding-bottom: 4vw;
+    }
+
+    .sentiment-forecast {
+        padding: 1rem 0.5rem;
+    }
+
+    .sentiment-forecast > div {
+        padding: 0;
+        overflow: visible;
+    }
+
+    .sentiment-forecast > div svg {
+        margin: 0;
+    }
+
+    .final-visualization {
+        flex-direction: column;
+    }
+
+    #viz-panel {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    #visualization-area {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .text-panel {
+        width: 100%;
+        margin-top: 2rem;
     }
 }
 
@@ -659,6 +699,36 @@ select {
     footer p {
         font-size: 0.85rem;
     }
+
+    .sentiment-forecast {
+        padding: 0.75rem;
+    }
+
+    #viz-panel {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 20rem) {
+    .sentiment-forecast {
+        padding: 0.5rem;
+    }
+
+    #viz-panel {
+        padding: 0.75rem;
+    }
+
+    #visualization-area {
+        max-width: 100%;
+    }
+
+    .text-panel {
+        margin-top: 1rem;
+    }
+
+    .context-map .visualization {
+        padding: 1rem;
+    }
 }
 
 .vis-reflection-content.flex {
@@ -695,4 +765,78 @@ footer {
 footer p {
     margin: 0.5rem 0;
     color: #666;
+}
+
+.tooltip {
+    position: absolute;
+    background: white;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1000;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    line-height: 1.5;
+}
+
+.tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.tooltip-header strong {
+    color: #333;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tooltip-date {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.tooltip-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #222;
+    font-size: 0.9rem;
+}
+
+.tooltip-body {
+    margin-bottom: 0.75rem;
+    color: #444;
+    font-size: 0.85rem;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.tooltip-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #666;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+.tooltip-meta span {
+    white-space: nowrap;
+}
+
+
+.sentiment.positive {
+  color: #4CAF50;
+}
+
+.sentiment.negative {
+  color: #E74C3C;
 }

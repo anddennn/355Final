@@ -68,58 +68,138 @@ const redditEngagementVsSentimentBubble = baseSpec({
       groupby: ["subreddit"]
     }
   ],
-  mark: { type: "circle", opacity: 1 },
-  encoding: {
-    x: {
-      field: "avg_sentiment",
-      type: "quantitative",
-      title: "Average Sentiment (Negative → Positive)",
-      scale: { domain: [-0.2, 0.2] }
+
+  layer: [
+    {
+      mark: { type: "circle", opacity: 1 },
+      encoding: {
+        x: {
+          field: "avg_sentiment",
+          type: "quantitative",
+          title: "Average Sentiment (Negative → Positive)",
+          scale: { domain: [-0.2, 0.2] }
+        },
+        y: {
+          field: "avg_engagement",
+          type: "quantitative",
+          title: "Average Engagement",
+          axis: {
+            labelExpr:
+              "datum.value >= 1e9 ? (datum.value/1e9 + 'B') : " +
+              "datum.value >= 1e6 ? (datum.value/1e6 + 'M') : " +
+              "datum.value >= 1e3 ? (datum.value/1e3 + 'k') : datum.value"
+          }
+        },
+        size: {
+          field: "avg_engagement",
+          type: "quantitative",
+          scale: { range: [50, 2000] },
+          legend: null
+        },
+        color: {
+          field: "avg_sentiment",
+          type: "quantitative",
+          title: "Sentiment",
+          scale: { scheme: "redblue" }
+        },
+        tooltip: [
+          { field: "subreddit", type: "nominal", title: "Subreddit" },
+          { field: "avg_engagement", type: "quantitative", format: ".2~s", title: "Avg Engagement" },
+          { field: "avg_sentiment", type: "quantitative", format: ".2f", title: "Avg Sentiment" }
+        ]
+      }
     },
-    y: {
-      field: "avg_engagement",
-      type: "quantitative",
-      title: "Average Engagement",
-        axis: {
-          labelExpr:
-            "datum.value >= 1e9 ? (datum.value/1e9 + 'B') : " +
-            "datum.value >= 1e6 ? (datum.value/1e6 + 'M') : " +
-            "datum.value >= 1e3 ? (datum.value/1e3 + 'k') : datum.value"
-        }
+    {transform: [
+        { filter: "datum.subreddit !== 'AskReddit' && datum.subreddit !== 'pics'  && datum.subreddit !== 'sports'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -14,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
     },
-    size: {
-      field: "avg_engagement",
-      type: "quantitative",
-      title: "Bubble Size (Avg Engagement)",
-      scale: { range: [50, 2000] },
-      legend: null
+    {
+      transform: [
+        { filter: "datum.subreddit === 'AskReddit'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -28,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
     },
-    color: {
-      field: "avg_sentiment",
-      type: "quantitative",
-      title: "Sentiment",
-      scale: { scheme: "redblue" }
+
+    {
+      transform: [
+        { filter: "datum.subreddit === 'pics'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -20,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
     },
-    tooltip: [
-      { field: "subreddit", type: "nominal" },
-      { field: "avg_engagement", type: "quantitative",format: ".2~s" },
-      { field: "avg_sentiment", type: "quantitative", format: ".2f" }
-    ]
-  },
+    {
+      transform: [
+        { filter: "datum.subreddit === 'sports'" }
+      ],
+      mark: {
+        type: "text",
+        align: "center",
+        baseline: "bottom",
+        dy: -10,
+        fontSize: 10,
+        color: "black"
+      },
+      encoding: {
+        x: { field: "avg_sentiment", type: "quantitative" },
+        y: { field: "avg_engagement", type: "quantitative" },
+        text: { field: "subreddit", type: "nominal" }
+      }
+    }
+  ],
+
   width: 500,
   height: 400
 });
 
-const redditAvgSentimentBySubreddit = baseSpec({
-  mark: "bar",
-  encoding: {
-    x: { field: "subreddit", type: "nominal", title: "Subreddit", sort: "-y" },
-    y: {
-      aggregate: "mean",
-      field: "sentiment_score",
-      type: "quantitative",
-      title: "Average sentiment score (-1 = negative, +1 = positive)"
-    },
+const getAvgSentimentSpec = () => {
+  const isTabletOrSmaller = window.innerWidth <= 768;
+  
+  return baseSpec({
+    mark: "bar",
+    encoding: {
+      x: { field: "subreddit", type: "nominal", title: "Subreddit", sort: "-y" },
+      y: {
+        aggregate: "mean",
+        field: "sentiment_score",
+        type: "quantitative",
+        title: isTabletOrSmaller ? "Avg Sentiment (-1 to +1)" : "Average sentiment score (-1 = negative, +1 = positive)"
+      },
     color: {
       aggregate: "mean",
       field: "sentiment_score",
@@ -135,7 +215,11 @@ const redditAvgSentimentBySubreddit = baseSpec({
   },
   width: 400,
   height: CHART_HEIGHT
-});
+  });
+};
+
+// Note: Use getAvgSentimentSpec() or embedAvgSentiment() for responsive title
+// The function checks window width dynamically, so it will update on resize
 
 const redditSentimentVsScore = baseSpec({
   selection: {
@@ -227,90 +311,194 @@ const redditEngagementVsSentiment = baseSpec({
   height: CHART_HEIGHT
 });
 
-const redditSentimentEmotions = {
-  $schema: SCHEMA,
-  data: { url: DATA_URL },
-  width: "container",
-  height: 400,
-  params: [
-    {
-      name: "Select_Subreddit",
-      value: "AskReddit"
+let globalEngagementDomain = null;
+
+const calculateGlobalEngagementDomain = async () => {
+  if (globalEngagementDomain) return globalEngagementDomain;
+  
+  try {
+    const data = await d3.csv(DATA_URL);
+    
+    // Group by year and subreddit, then calculate avg_engagement for each group
+    const grouped = d3.group(data, d => {
+      const date = new Date(d.date_utc);
+      if (isNaN(date.getTime())) return null;
+      const year = date.getFullYear();
+      return `${year}_${d.subreddit}`;
+    });
+    
+    const avgEngagements = Array.from(grouped.entries())
+      .filter(([key]) => key !== null)
+      .map(([_, group]) => {
+        const scores = group.map(d => {
+          const score = +d.score;
+          return isNaN(score) ? null : score;
+        }).filter(v => v !== null && v >= 0);
+        
+        return scores.length > 0 ? d3.mean(scores) : null;
+      })
+      .filter(v => v !== null && !isNaN(v) && v >= 0);
+    
+    if (avgEngagements.length === 0) {
+      globalEngagementDomain = [0, 1000];
+      return globalEngagementDomain;
     }
-  ],
-  transform: [
-    { filter: { field: "subreddit", equal: { expr: "Select_Subreddit" } } },
-    { timeUnit: "year", field: "date_utc", as: "year" },
-    {
-      calculate: "year(datum.year)",
-      as: "year_number"
-    },
-    {
-      aggregate: [
-        { op: "mean", field: "sentiment_score", as: "avg_sentiment" },
-        { op: "mean", field: "score", as: "avg_engagement" }
-      ],
-      groupby: ["year_number"]
-    },
-    {
-      calculate: "datum.avg_sentiment > 0.3 ? '🤩' : datum.avg_sentiment > 0.2 ? '😄' : datum.avg_sentiment > 0.1 ? '😊' : datum.avg_sentiment > 0.05 ? '🙂' : datum.avg_sentiment > -0.05 ? '😐' : datum.avg_sentiment > -0.1 ? '😕' : datum.avg_sentiment > -0.2 ? '😟' : datum.avg_sentiment > -0.3 ? '😠' : '🤬'",
-      as: "emotion_emoji"
-    }
-  ],
-  encoding: {
-    x: {
-      field: "year_number",
-      type: "ordinal",
-      title: "Year",
-      axis: { 
-        labelAngle: 0, 
-        labelFontSize: 12
+    
+    const min = d3.min(avgEngagements);
+    const max = d3.max(avgEngagements);
+    
+    // Add some padding to the domain
+    const padding = (max - min) * 0.1;
+    globalEngagementDomain = [
+      Math.max(0, min - padding),
+      max + padding
+    ];
+    
+    return globalEngagementDomain;
+  } catch (error) {
+    console.error("Error calculating global engagement domain:", error);
+    return [0, 1000];
+  }
+};
+
+const getSentimentEmotionsSpec = (yDomain = null) => {
+  const isMobile = window.innerWidth <= 480;
+  
+  return {
+    $schema: SCHEMA,
+    data: { url: DATA_URL },
+    width: "container",
+    height: 400,
+    params: [
+      {
+        name: "Select_Subreddit",
+        value: "AskReddit"
       }
-    },
-    y: {
-      field: "avg_engagement",
-      type: "quantitative",
-      title: "Average Engagement (Upvotes)",
-      format: ".2~s",
-      scale: { zero: false, padding: 0.2 }
-    }
-  },
-  layer: [
-    {
-      mark: { type: "line", interpolate: "monotone", color: "#e0e0e0", strokeWidth: 2 }
-    },
-    {
-      mark: { type: "circle", size: 3000, opacity: .4, yOffset: -3 },
-      encoding: {
-        color: {
-          field: "avg_sentiment",
-          type: "quantitative",
-          scale: { 
-            scheme: "RdYlGn",
-            domainMid: 0,
-            range: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"]
-          },
-          legend: { title: "Avg Sentiment" }
+    ],
+    transform: [
+      { filter: { field: "subreddit", equal: { expr: "Select_Subreddit" } } },
+      { timeUnit: "year", field: "date_utc", as: "year" },
+      {
+        calculate: "year(datum.year)",
+        as: "year_number"
+      },
+      {
+        aggregate: [
+          { op: "mean", field: "sentiment_score", as: "avg_sentiment" },
+          { op: "mean", field: "score", as: "avg_engagement" }
+        ],
+        groupby: ["year_number"]
+      },
+      {
+        calculate: "datum.avg_sentiment > 0.3 ? '🤩' : datum.avg_sentiment > 0.2 ? '😄' : datum.avg_sentiment > 0.1 ? '😊' : datum.avg_sentiment > 0.05 ? '🙂' : datum.avg_sentiment > -0.05 ? '😐' : datum.avg_sentiment > -0.1 ? '😕' : datum.avg_sentiment > -0.2 ? '😟' : datum.avg_sentiment > -0.3 ? '😠' : '🤬'",
+        as: "emotion_emoji"
+      }
+    ],
+    encoding: {
+      x: {
+        field: "year_number",
+        type: "ordinal",
+        title: "Year",
+        axis: { 
+          labelAngle: isMobile ? -90 : 0, 
+          labelFontSize: isMobile ? 10 : 12
+        }
+      },
+      y: {
+        field: "avg_engagement",
+        type: "quantitative",
+        title: "Average Engagement (Upvotes)",
+        axis: { 
+          format: isMobile ? ".0s" : ".2s"
+        },
+        scale: { 
+          zero: false, 
+          padding: 0.2,
+          ...(yDomain ? { domain: yDomain } : {})
         }
       }
     },
-    {
-      mark: { type: "text", fontSize: 40, baseline: "middle" },
-      encoding: {
-        text: { field: "emotion_emoji" },
-        tooltip: [
-          { field: "year", title: "Year", timeUnit: "year" },
-          { field: "avg_engagement", title: "Avg Engagement", format: ",.0f" },
-          { field: "avg_sentiment", title: "Sentiment Score", format: ".3f" }
-        ]
+    layer: [
+      {
+        mark: { type: "line", interpolate: "monotone", color: "#e0e0e0", strokeWidth: 2 }
+      },
+      {
+        mark: { type: "circle", size: isMobile ? 1500 : 3000, opacity: .4, yOffset: -3 },
+        encoding: {
+          color: {
+            field: "avg_sentiment",
+            type: "quantitative",
+            scale: { 
+              scheme: "RdYlGn",
+              domainMid: 0,
+              range: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"]
+            },
+            legend: isMobile ? null : { title: "Avg Sentiment" }
+          }
+        }
+      },
+      {
+        mark: { type: "text", fontSize: isMobile ? 24 : 40, baseline: "middle" },
+        encoding: {
+          text: { field: "emotion_emoji" },
+          tooltip: [
+            { field: "avg_engagement", title: "Avg Engagement", format: ".2~s" },
+            { field: "avg_sentiment", title: "Sentiment Score", format: ".3f" }
+          ]
+        }
+      }
+    ]
+  };
+};
+
+const getBubbleSpec = () => {
+  const isMobile = window.innerWidth <= 480;
+  const isTabletOrSmaller = window.innerWidth <= 768;
+  
+  if (isTabletOrSmaller) {
+    const container = document.querySelector("#vis-popularity");
+    if (container) {
+      const section = container.closest('section');
+      if (section) {
+        const sectionWidth = section.offsetWidth;
+        const padding = parseFloat(getComputedStyle(section).paddingLeft) + 
+                       parseFloat(getComputedStyle(section).paddingRight);
+        const vizPadding = parseFloat(getComputedStyle(container.closest('.visualization')).paddingLeft) + 
+                          parseFloat(getComputedStyle(container.closest('.visualization')).paddingRight);
+        const availableWidth = sectionWidth - padding - vizPadding;
+        
+        let scaledWidth;
+        if (isMobile) {
+          scaledWidth = Math.min(280, Math.max(250, availableWidth - 10));
+        } else {
+          scaledWidth = Math.min(350, Math.max(280, availableWidth - 15));
+        }
+        const scaledHeight = Math.round((400 / 500) * scaledWidth);
+        
+        return {
+          ...redditEngagementVsSentimentBubble,
+          width: scaledWidth,
+          height: scaledHeight
+        };
       }
     }
-  ]
+  }
+  
+  return {
+    ...redditEngagementVsSentimentBubble,
+    width: getResponsiveWidth(500, "#vis-popularity"),
+    height: Math.round((400 / 500) * getResponsiveWidth(500, "#vis-popularity"))
+  };
 };
 
 const originalBubbleSpec = redditEngagementVsSentimentBubble;
 
-embed("#vis-popularity", redditEngagementVsSentimentBubble, "Vis 1");
+const embedBubbleViz = () => {
+  const spec = getBubbleSpec();
+  embed("#vis-popularity", spec, "Vis 1");
+};
+
+embedBubbleViz();
 
 let weatherView = null;
 
@@ -342,13 +530,22 @@ const setupSubredditButtons = () => {
   });
 };
 
-vegaEmbed("#vis-weather", redditSentimentEmotions, EMBED_OPTIONS)
-  .then((result) => {
-    weatherView = result.view;
-    console.log("Vis Weather loaded");
-    setupSubredditButtons();
-  })
-  .catch(error => console.error("Vis Weather error:", error));
+const embedSentimentEmotions = async () => {
+  const yDomain = await calculateGlobalEngagementDomain();
+  const spec = getSentimentEmotionsSpec(yDomain);
+  const currentSubreddit = weatherView ? weatherView.signal("Select_Subreddit") : "AskReddit";
+  spec.params[0].value = currentSubreddit;
+  
+  vegaEmbed("#vis-weather", spec, EMBED_OPTIONS)
+    .then((result) => {
+      weatherView = result.view;
+      console.log("Vis Weather loaded");
+      setupSubredditButtons();
+    })
+    .catch(error => console.error("Vis Weather error:", error));
+};
+
+embedSentimentEmotions().catch(error => console.error("Error embedding weather:", error));
 
 document.addEventListener('DOMContentLoaded', () => {
   if (weatherView) {
@@ -356,13 +553,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+const embedAvgSentiment = () => {
+  const spec = getAvgSentimentSpec();
+  embed("#vis-sentiment-subreddit", spec, "Avg Sentiment");
+};
+
+// Embed if container exists
+const sentimentSubredditContainer = document.querySelector("#vis-sentiment-subreddit");
+if (sentimentSubredditContainer) {
+  embedAvgSentiment();
+}
+
 let resizeTimeout;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     const container = document.querySelector("#vis-popularity");
     if (container && container.innerHTML) {
-      embed("#vis-popularity", originalBubbleSpec, "Vis 1");
+      embedBubbleViz();
+    }
+      const weatherContainer = document.querySelector("#vis-weather");
+      if (weatherContainer && weatherContainer.innerHTML) {
+        embedSentimentEmotions().catch(error => console.error("Error re-embedding weather:", error));
+      }
+    const sentimentContainer = document.querySelector("#vis-sentiment-subreddit");
+    if (sentimentContainer && sentimentContainer.innerHTML) {
+      embedAvgSentiment();
+    }
+    // Update bubble grid visualization on resize
+    const selectElement = document.getElementById("subreddit-select");
+    if (selectElement && fullData) {
+      const currentSubreddit = selectElement.value;
+      updateVisualization(currentSubreddit);
     }
   }, 250);
 });
@@ -398,11 +620,31 @@ function updateVisualization(selectedSubreddit) {
     viz.innerHTML = "";
 
     // ----- DRAW BUBBLE GRID -----
-
-    const width = 400;
-    const height = 400;
-    const radius = 10;
-    const padding = 4;
+    
+    // Calculate responsive dimensions
+    const isMobile = window.innerWidth <= 480;
+    const isTablet = window.innerWidth <= 768;
+    
+    let width, height, radius, padding;
+    if (isMobile) {
+        const container = document.getElementById("visualization-area");
+        const containerWidth = container ? container.offsetWidth : 280;
+        width = Math.min(280, Math.max(250, containerWidth - 20));
+        height = width; // Keep it square
+        radius = 6;
+        padding = 3;
+    } else if (isTablet) {
+        width = 350;
+        height = 350;
+        radius = 8;
+        padding = 3.5;
+    } else {
+        width = 400;
+        height = 400;
+        radius = 10;
+        padding = 4;
+    }
+    
     const columns = Math.floor(width / (radius * 2 + padding));
 
     const sentimentOrder = ["negative", "neutral", "positive"];
@@ -423,10 +665,13 @@ function updateVisualization(selectedSubreddit) {
         negative: "#E74C3C"
     };
 
-    // Tooltip
-    const tooltip = d3.select("body")
-        .append("div")
-        .attr("class", "tooltip");
+    // Tooltip (create only if it doesn't exist)
+    let tooltip = d3.select("body").select(".tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip");
+    }
 
     // SVG container
     const svg = d3.select("#visualization-area")
@@ -443,11 +688,27 @@ function updateVisualization(selectedSubreddit) {
         .attr("r", radius)
         .attr("fill", d => color[d.sentiment_name])
         .on("mouseover", (event, d) => {
+            const postBody = d.body || d.selftext || d.text || "";
+            const postTitle = d.title || "(no title)";
+            const postDate = d.date_utc ? new Date(d.date_utc).toLocaleDateString() : "Unknown date";
+            const postScore = d.score !== undefined ? d.score.toLocaleString() : "N/A";
+            const postComments = d.num_comments !== undefined ? d.num_comments.toLocaleString() : "N/A";
+            
             tooltip
                 .style("opacity", 1)
                 .html(`
-                    <strong>${d.sentiment_name.toUpperCase()}</strong><br>
-                    ${d.title || "(no title)"}
+                    <div class="tooltip-header">
+                        <strong class="sentiment ${d.sentiment_name}">
+                      ${d.sentiment_name.toUpperCase()}
+                    </strong>
+                        <span class="tooltip-date">${postDate}</span>
+                    </div>
+                    <div class="tooltip-title">${postTitle}</div>
+                    ${postBody ? `<div class="tooltip-body">${postBody.substring(0, 500)}${postBody.length > 500 ? '...' : ''}</div>` : ''}
+                    <div class="tooltip-meta">
+                        <span>Score: ${postScore}</span>
+                        <span>Comments: ${postComments}</span>
+                    </div>
                 `);
         })
         .on("mousemove", event => {
